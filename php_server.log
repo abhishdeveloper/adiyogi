@@ -1,31 +1,31 @@
-[Sun Jun 28 08:38:32 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Sun Jun 28 08:39:01 2026] [::1]:47012 Accepted
-[Sun Jun 28 08:39:01 2026] [::1]:47012 [200]: HEAD /
-[Sun Jun 28 08:39:01 2026] [::1]:47012 Closing
-[Sun Jun 28 08:40:09 2026] [::1]:51022 Accepted
-[Sun Jun 28 08:40:09 2026] [::1]:51022 [200]: GET /
-[Sun Jun 28 08:40:09 2026] [::1]:51022 Closing
-[Sun Jun 28 08:40:09 2026] [::1]:51034 Accepted
-[Sun Jun 28 08:40:09 2026] [::1]:51050 Accepted
-[Sun Jun 28 08:40:09 2026] [::1]:51034 [200]: GET /assets/css/style.css
-[Sun Jun 28 08:40:09 2026] [::1]:51034 Closing
-[Sun Jun 28 08:40:09 2026] [::1]:51050 [200]: GET /assets/js/main.js
-[Sun Jun 28 08:40:09 2026] [::1]:51050 Closing
-[Sun Jun 28 08:40:11 2026] [::1]:51052 Accepted
-[Sun Jun 28 08:40:11 2026] [::1]:51052 [200]: GET /pages/services
-[Sun Jun 28 08:40:11 2026] [::1]:51052 Closing
-[Sun Jun 28 08:40:11 2026] [::1]:51056 Accepted
-[Sun Jun 28 08:40:11 2026] [::1]:51070 Accepted
-[Sun Jun 28 08:40:11 2026] [::1]:51056 [200]: GET /assets/css/style.css
-[Sun Jun 28 08:40:11 2026] [::1]:51070 [200]: GET /assets/js/main.js
-[Sun Jun 28 08:40:11 2026] [::1]:51056 Closing
-[Sun Jun 28 08:40:11 2026] [::1]:51070 Closing
-[Sun Jun 28 08:40:12 2026] [::1]:51082 Accepted
-[Sun Jun 28 08:40:12 2026] [::1]:51082 [200]: GET /pages/features
-[Sun Jun 28 08:40:12 2026] [::1]:51082 Closing
-[Sun Jun 28 08:40:12 2026] [::1]:51086 Accepted
-[Sun Jun 28 08:40:12 2026] [::1]:51088 Accepted
-[Sun Jun 28 08:40:12 2026] [::1]:51086 [200]: GET /assets/css/style.css
-[Sun Jun 28 08:40:12 2026] [::1]:51086 Closing
-[Sun Jun 28 08:40:12 2026] [::1]:51088 [200]: GET /assets/js/main.js
-[Sun Jun 28 08:40:12 2026] [::1]:51088 Closing
+[Sun Jun 28 09:04:02 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Sun Jun 28 09:05:32 2026] [::1]:36374 Accepted
+[Sun Jun 28 09:05:32 2026] [::1]:36374 [200]: GET /auth/login
+[Sun Jun 28 09:05:32 2026] [::1]:36374 Closing
+[Sun Jun 28 09:05:32 2026] [::1]:36380 Accepted
+[Sun Jun 28 09:05:32 2026] [::1]:36394 Accepted
+[Sun Jun 28 09:05:32 2026] [::1]:36380 [200]: GET /assets/css/style.css
+[Sun Jun 28 09:05:32 2026] [::1]:36380 Closing
+[Sun Jun 28 09:05:32 2026] [::1]:36394 [200]: GET /assets/js/main.js
+[Sun Jun 28 09:05:32 2026] [::1]:36394 Closing
+[Sun Jun 28 09:07:33 2026] [::1]:38430 Accepted
+[Sun Jun 28 09:07:33 2026] [::1]:38430 [200]: GET /auth/login
+[Sun Jun 28 09:07:33 2026] [::1]:38430 Closing
+[Sun Jun 28 09:07:33 2026] [::1]:38434 Accepted
+[Sun Jun 28 09:07:33 2026] [::1]:38446 Accepted
+[Sun Jun 28 09:07:33 2026] [::1]:38434 [200]: GET /assets/css/style.css
+[Sun Jun 28 09:07:33 2026] [::1]:38434 Closing
+[Sun Jun 28 09:07:33 2026] [::1]:38446 [200]: GET /assets/js/main.js
+[Sun Jun 28 09:07:33 2026] [::1]:38446 Closing
+[Sun Jun 28 09:09:21 2026] [::1]:45470 Accepted
+[Sun Jun 28 09:09:21 2026] [::1]:45470 [200]: GET /auth/login
+[Sun Jun 28 09:09:21 2026] [::1]:45470 Closing
+[Sun Jun 28 09:09:21 2026] [::1]:45476 Accepted
+[Sun Jun 28 09:09:21 2026] [::1]:45480 Accepted
+[Sun Jun 28 09:09:21 2026] [::1]:45476 [200]: GET /assets/css/style.css
+[Sun Jun 28 09:09:21 2026] [::1]:45480 [200]: GET /assets/js/main.js
+[Sun Jun 28 09:09:21 2026] [::1]:45476 Closing
+[Sun Jun 28 09:09:21 2026] [::1]:45480 Closing
+[Sun Jun 28 09:10:51 2026] [::1]:51734 Accepted
+[Sun Jun 28 09:10:51 2026] [::1]:51734 [200]: HEAD /auth/login
+[Sun Jun 28 09:10:51 2026] [::1]:51734 Closing
