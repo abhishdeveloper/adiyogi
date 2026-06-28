@@ -1,0 +1,11 @@
+Options -Indexes
+
+RewriteEngine On
+
+# Route all requests to index.php if they are not actual files or directories
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+# Prevent direct access to app and core directories
+RewriteRule ^(app|core)/(.*)$ - [R=404,L]

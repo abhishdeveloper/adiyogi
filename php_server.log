@@ -1,0 +1,31 @@
+[Sun Jun 28 08:38:32 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Sun Jun 28 08:39:01 2026] [::1]:47012 Accepted
+[Sun Jun 28 08:39:01 2026] [::1]:47012 [200]: HEAD /
+[Sun Jun 28 08:39:01 2026] [::1]:47012 Closing
+[Sun Jun 28 08:40:09 2026] [::1]:51022 Accepted
+[Sun Jun 28 08:40:09 2026] [::1]:51022 [200]: GET /
+[Sun Jun 28 08:40:09 2026] [::1]:51022 Closing
+[Sun Jun 28 08:40:09 2026] [::1]:51034 Accepted
+[Sun Jun 28 08:40:09 2026] [::1]:51050 Accepted
+[Sun Jun 28 08:40:09 2026] [::1]:51034 [200]: GET /assets/css/style.css
+[Sun Jun 28 08:40:09 2026] [::1]:51034 Closing
+[Sun Jun 28 08:40:09 2026] [::1]:51050 [200]: GET /assets/js/main.js
+[Sun Jun 28 08:40:09 2026] [::1]:51050 Closing
+[Sun Jun 28 08:40:11 2026] [::1]:51052 Accepted
+[Sun Jun 28 08:40:11 2026] [::1]:51052 [200]: GET /pages/services
+[Sun Jun 28 08:40:11 2026] [::1]:51052 Closing
+[Sun Jun 28 08:40:11 2026] [::1]:51056 Accepted
+[Sun Jun 28 08:40:11 2026] [::1]:51070 Accepted
+[Sun Jun 28 08:40:11 2026] [::1]:51056 [200]: GET /assets/css/style.css
+[Sun Jun 28 08:40:11 2026] [::1]:51070 [200]: GET /assets/js/main.js
+[Sun Jun 28 08:40:11 2026] [::1]:51056 Closing
+[Sun Jun 28 08:40:11 2026] [::1]:51070 Closing
+[Sun Jun 28 08:40:12 2026] [::1]:51082 Accepted
+[Sun Jun 28 08:40:12 2026] [::1]:51082 [200]: GET /pages/features
+[Sun Jun 28 08:40:12 2026] [::1]:51082 Closing
+[Sun Jun 28 08:40:12 2026] [::1]:51086 Accepted
+[Sun Jun 28 08:40:12 2026] [::1]:51088 Accepted
+[Sun Jun 28 08:40:12 2026] [::1]:51086 [200]: GET /assets/css/style.css
+[Sun Jun 28 08:40:12 2026] [::1]:51086 Closing
+[Sun Jun 28 08:40:12 2026] [::1]:51088 [200]: GET /assets/js/main.js
+[Sun Jun 28 08:40:12 2026] [::1]:51088 Closing
