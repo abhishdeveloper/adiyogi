@@ -100,4 +100,19 @@ class User {
 
         return $this->db->single();
     }
+
+    // Doctor creates a patient profile (basic)
+    public function createPatientProfile($first_name, $last_name, $email, $password) {
+        $this->db->query('INSERT INTO users (role, email, password, first_name, last_name, is_active) VALUES ("patient", :email, :password, :first_name, :last_name, 1)');
+
+        $this->db->bind(':email', $email);
+        $this->db->bind(':password', password_hash($password, PASSWORD_BCRYPT));
+        $this->db->bind(':first_name', $first_name);
+        $this->db->bind(':last_name', $last_name);
+
+        if ($this->db->execute()) {
+            return $this->db->lastInsertId();
+        }
+        return false;
+    }
 }

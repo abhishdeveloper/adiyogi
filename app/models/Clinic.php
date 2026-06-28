@@ -48,4 +48,61 @@ class Clinic {
         } while ($this->codeExists($code));
         return $code;
     }
+
+    // Get clinic by User ID
+    public function getClinicByUserId($user_id) {
+        $this->db->query('SELECT * FROM clinics WHERE user_id = :user_id');
+        $this->db->bind(':user_id', $user_id);
+        return $this->db->single();
+    }
+
+    // Get clinic by slug
+    public function getClinicBySlug($slug) {
+        $this->db->query('SELECT * FROM clinics WHERE url_slug = :slug');
+        $this->db->bind(':slug', $slug);
+        return $this->db->single();
+    }
+
+    // Update clinic profile
+    public function updateProfile($data) {
+        $this->db->query('UPDATE clinics SET
+            bio = :bio,
+            degrees = :degrees,
+            achievements = :achievements,
+            social_links = :social_links,
+            theme_preference = :theme_preference,
+            profile_image = COALESCE(:profile_image, profile_image)
+            WHERE user_id = :user_id');
+
+        $this->db->bind(':user_id', $data['user_id']);
+        $this->db->bind(':bio', $data['bio']);
+        $this->db->bind(':degrees', $data['degrees']);
+        $this->db->bind(':achievements', $data['achievements']);
+        $this->db->bind(':social_links', json_encode($data['social_links']));
+        $this->db->bind(':theme_preference', $data['theme_preference']);
+
+        if (isset($data['profile_image']) && !empty($data['profile_image'])) {
+            $this->db->bind(':profile_image', $data['profile_image']);
+        } else {
+            $this->db->bind(':profile_image', null, PDO::PARAM_NULL);
+        }
+
+        return $this->db->execute();
+    }
+
+    // Update premium settings
+    public function updatePremiumSettings($data) {
+        $this->db->query('UPDATE clinics SET
+            razorpay_key = :razorpay_key,
+            razorpay_secret = :razorpay_secret,
+            payment_preference = :payment_preference
+            WHERE user_id = :user_id AND is_premium = 1');
+
+        $this->db->bind(':user_id', $data['user_id']);
+        $this->db->bind(':razorpay_key', $data['razorpay_key']);
+        $this->db->bind(':razorpay_secret', $data['razorpay_secret']);
+        $this->db->bind(':payment_preference', $data['payment_preference']);
+
+        return $this->db->execute();
+    }
 }

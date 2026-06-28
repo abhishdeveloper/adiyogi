@@ -28,6 +28,16 @@ CREATE TABLE IF NOT EXISTS `clinics` (
   `license_number` varchar(100) DEFAULT NULL,
   `specialty` varchar(255) DEFAULT NULL,
   `is_verified` tinyint(1) NOT NULL DEFAULT 0,
+  `profile_image` varchar(255) DEFAULT NULL,
+  `bio` text,
+  `degrees` text,
+  `achievements` text,
+  `social_links` text,
+  `theme_preference` varchar(50) NOT NULL DEFAULT 'modern',
+  `is_premium` tinyint(1) NOT NULL DEFAULT 0,
+  `razorpay_key` varchar(255) DEFAULT NULL,
+  `razorpay_secret` varchar(255) DEFAULT NULL,
+  `payment_preference` enum('global','online','offline','both') NOT NULL DEFAULT 'global',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_code` (`unique_code`),
@@ -48,6 +58,25 @@ CREATE TABLE IF NOT EXISTS `patient_clinic_links` (
   CONSTRAINT `fk_link_clinic` FOREIGN KEY (`clinic_id`) REFERENCES `clinics` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS `appointments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clinic_id` int(11) NOT NULL,
+  `patient_user_id` int(11) NOT NULL,
+  `appointment_datetime` datetime NOT NULL,
+  `status` enum('pending','confirmed','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `payment_method` enum('online','offline') NOT NULL DEFAULT 'offline',
+  `payment_status` enum('pending','paid','failed','refunded') NOT NULL DEFAULT 'pending',
+  `amount` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `razorpay_order_id` varchar(255) DEFAULT NULL,
+  `razorpay_payment_id` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `clinic_id` (`clinic_id`),
+  KEY `patient_user_id` (`patient_user_id`),
+  CONSTRAINT `fk_app_clinic` FOREIGN KEY (`clinic_id`) REFERENCES `clinics` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_app_patient` FOREIGN KEY (`patient_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS `settings` (
   `setting_key` varchar(100) NOT NULL,
   `setting_value` text,
@@ -62,4 +91,7 @@ INSERT INTO `users` (`role`, `email`, `password`, `first_name`, `last_name`, `is
 -- Insert placeholder settings
 INSERT INTO `settings` (`setting_key`, `setting_value`) VALUES
 ('google_client_id', ''),
-('google_client_secret', '');
+('google_client_secret', ''),
+('razorpay_key_id', ''),
+('razorpay_key_secret', ''),
+('global_payment_preference', 'both');

@@ -1,31 +1,13 @@
-[Sun Jun 28 09:04:02 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
-[Sun Jun 28 09:05:32 2026] [::1]:36374 Accepted
-[Sun Jun 28 09:05:32 2026] [::1]:36374 [200]: GET /auth/login
-[Sun Jun 28 09:05:32 2026] [::1]:36374 Closing
-[Sun Jun 28 09:05:32 2026] [::1]:36380 Accepted
-[Sun Jun 28 09:05:32 2026] [::1]:36394 Accepted
-[Sun Jun 28 09:05:32 2026] [::1]:36380 [200]: GET /assets/css/style.css
-[Sun Jun 28 09:05:32 2026] [::1]:36380 Closing
-[Sun Jun 28 09:05:32 2026] [::1]:36394 [200]: GET /assets/js/main.js
-[Sun Jun 28 09:05:32 2026] [::1]:36394 Closing
-[Sun Jun 28 09:07:33 2026] [::1]:38430 Accepted
-[Sun Jun 28 09:07:33 2026] [::1]:38430 [200]: GET /auth/login
-[Sun Jun 28 09:07:33 2026] [::1]:38430 Closing
-[Sun Jun 28 09:07:33 2026] [::1]:38434 Accepted
-[Sun Jun 28 09:07:33 2026] [::1]:38446 Accepted
-[Sun Jun 28 09:07:33 2026] [::1]:38434 [200]: GET /assets/css/style.css
-[Sun Jun 28 09:07:33 2026] [::1]:38434 Closing
-[Sun Jun 28 09:07:33 2026] [::1]:38446 [200]: GET /assets/js/main.js
-[Sun Jun 28 09:07:33 2026] [::1]:38446 Closing
-[Sun Jun 28 09:09:21 2026] [::1]:45470 Accepted
-[Sun Jun 28 09:09:21 2026] [::1]:45470 [200]: GET /auth/login
-[Sun Jun 28 09:09:21 2026] [::1]:45470 Closing
-[Sun Jun 28 09:09:21 2026] [::1]:45476 Accepted
-[Sun Jun 28 09:09:21 2026] [::1]:45480 Accepted
-[Sun Jun 28 09:09:21 2026] [::1]:45476 [200]: GET /assets/css/style.css
-[Sun Jun 28 09:09:21 2026] [::1]:45480 [200]: GET /assets/js/main.js
-[Sun Jun 28 09:09:21 2026] [::1]:45476 Closing
-[Sun Jun 28 09:09:21 2026] [::1]:45480 Closing
-[Sun Jun 28 09:10:51 2026] [::1]:51734 Accepted
-[Sun Jun 28 09:10:51 2026] [::1]:51734 [200]: HEAD /auth/login
-[Sun Jun 28 09:10:51 2026] [::1]:51734 Closing
+[Sun Jun 28 14:00:54 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Sun Jun 28 14:01:30 2026] [::1]:36048 Accepted
+[Sun Jun 28 14:01:30 2026] [::1]:36048 Closing
+[Sun Jun 28 14:03:05 2026] [::1]:60714 Accepted
+[Sun Jun 28 14:03:05 2026] [::1]:60714 Closing
+[Sun Jun 28 14:04:29 2026] [::1]:60852 Accepted
+[Sun Jun 28 14:04:29 2026] [::1]:60852 Closing
+[Sun Jun 28 14:04:29 2026] [::1]:60868 Accepted
+[Sun Jun 28 14:04:29 2026] [::1]:60870 Accepted
+[Sun Jun 28 14:04:29 2026] [::1]:60868 Closing
+[Sun Jun 28 14:04:29 2026] [::1]:60870 Closing
+[Sun Jun 28 14:04:29 2026] [::1]:60884 Accepted
+[Sun Jun 28 14:04:29 2026] [::1]:60884 Closing
