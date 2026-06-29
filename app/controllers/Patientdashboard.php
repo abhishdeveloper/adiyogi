@@ -134,6 +134,14 @@ class PatientDashboard extends Controller {
             $app_id = $this->appointmentModel->createAppointment($appData);
 
             if($app_id) {
+                // Email patient about appointment creation
+                $mailer = new Mailer();
+                $subject = "Appointment Booked - " . $clinic->clinic_name;
+                $msg = "<p>Hello " . $_SESSION['user_name'] . ",</p>";
+                $msg .= "<p>Your appointment at " . $clinic->clinic_name . " has been booked for " . date('M j, Y h:i A', strtotime($datetime)) . ".</p>";
+                $msg .= "<p>Payment Method: " . ucfirst($method) . "</p>";
+                @$mailer->send($_SESSION['user_email'], $subject, $msg);
+
                 if($method == 'online') {
                     // Integrate Razorpay Order API using cURL
                     $orderData = [

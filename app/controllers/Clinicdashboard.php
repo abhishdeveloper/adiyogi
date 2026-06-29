@@ -1,5 +1,5 @@
 <?php
-class ClinicDashboard extends Controller {
+class Clinicdashboard extends Controller {
     private $clinicModel;
     private $appointmentModel;
     private $userModel;
@@ -13,6 +13,8 @@ class ClinicDashboard extends Controller {
         $this->clinicModel = $this->model('Clinic');
         $this->appointmentModel = $this->model('Appointment');
         $this->userModel = $this->model('User');
+        $this->presavedModel = $this->model('PresavedItem');
+        $this->prescriptionModel = $this->model('Prescription');
     }
 
     // Dashboard Overview
@@ -145,6 +147,13 @@ class ClinicDashboard extends Controller {
                     ];
 
                     if($this->appointmentModel->createAppointment($appointmentData)) {
+                        // Email patient about appointment creation
+                        $mailer = new Mailer();
+                        $subject = "Appointment Confirmed - " . $clinic->clinic_name;
+                        $msg = "<p>Hello " . $data['first_name'] . ",</p>";
+                        $msg .= "<p>Your appointment at " . $clinic->clinic_name . " has been booked for " . date('M j, Y h:i A', strtotime($data['appointment_datetime'])) . ".</p>";
+                        @$mailer->send($data['email'], $subject, $msg);
+
                         header('location: /clinicdashboard/index?success=booked');
                         exit;
                     } else {
@@ -165,5 +174,125 @@ class ClinicDashboard extends Controller {
             ];
             $this->view('clinic/book', $data);
         }
+    }
+
+    // Manage Presaved Items (Medicines, Diets, Templates)
+    public function presaved() {
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$this->validateCsrfToken($_POST['csrf_token'])) {
+                die("CSRF token validation failed.");
+            }
+
+            if(isset($_POST['action']) && $_POST['action'] == 'add') {
+                $data = [
+                    'clinic_id' => $clinic->id,
+                    'item_type' => trim($_POST['item_type']),
+                    'title' => trim($_POST['title']),
+                    'content' => trim($_POST['content'])
+                ];
+                $this->presavedModel->addItem($data);
+            } elseif(isset($_POST['action']) && $_POST['action'] == 'delete') {
+                $this->presavedModel->deleteItem($_POST['item_id'], $clinic->id);
+            }
+
+            header('location: /clinicdashboard/presaved');
+            exit;
+        }
+
+        $items = $this->presavedModel->getItemsByClinic($clinic->id);
+
+        $data = [
+            'clinic' => $clinic,
+            'items' => $items
+        ];
+
+        $this->view('clinic/presaved', $data);
+    }
+
+    // Attend Appointment (Write Prescription & Chat)
+    public function attend($appointment_id) {
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $appointment = $this->appointmentModel->getAppointmentById($appointment_id);
+
+        if(!$appointment || $appointment->clinic_id != $clinic->id) {
+            die("Invalid appointment.");
+        }
+
+        // Check if prescription already exists
+        $existing = $this->prescriptionModel->getByAppointment($appointment_id);
+        if($existing) {
+            header("location: /clinicdashboard/view_prescription/" . $appointment_id);
+            exit;
+        }
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$this->validateCsrfToken($_POST['csrf_token'])) {
+                die("CSRF token validation failed.");
+            }
+
+            $prescData = [
+                'appointment_id' => $appointment_id,
+                'clinic_id' => $clinic->id,
+                'patient_user_id' => $appointment->patient_user_id,
+                'diagnosis' => trim($_POST['diagnosis']),
+                'medicines' => trim($_POST['medicines']),
+                'diet_instructions' => trim($_POST['diet_instructions']),
+                'notes' => trim($_POST['notes'])
+            ];
+
+            if($this->prescriptionModel->save($prescData)) {
+
+                // Email patient that prescription is ready
+                $mailer = new Mailer();
+                $subject = "Your Prescription is Ready - " . $clinic->clinic_name;
+                $link = APP_URL . "/patientdashboard/prescription/" . $appointment_id;
+                $msg = "<p>Hello " . $appointment->first_name . ",</p>";
+                $msg .= "<p>Your prescription is ready. You can view or download it by clicking the link below:</p>";
+                $msg .= "<p><a href='$link'>View Prescription</a></p>";
+                @$mailer->send($appointment->email, $subject, $msg);
+
+                header("location: /clinicdashboard/view_prescription/" . $appointment_id);
+                exit;
+            }
+        }
+
+        // Load presaved items for quick insertion
+        $presaved = [
+            'medicines' => $this->presavedModel->getItemsByClinic($clinic->id, 'medicine'),
+            'diets' => $this->presavedModel->getItemsByClinic($clinic->id, 'diet'),
+            'templates' => $this->presavedModel->getItemsByClinic($clinic->id, 'template')
+        ];
+
+        $data = [
+            'clinic' => $clinic,
+            'appointment' => $appointment,
+            'presaved' => $presaved
+        ];
+
+        $this->view('clinic/attend', $data);
+    }
+
+    public function view_prescription($appointment_id) {
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $prescription = $this->prescriptionModel->getByAppointment($appointment_id);
+
+        if(!$prescription || $prescription->clinic_id != $clinic->id) {
+            die("Prescription not found.");
+        }
+
+        // Generate sharing links
+        $public_link = APP_URL . "/patientdashboard/prescription/" . $appointment_id; // Will implement secure patient view
+        $whatsapp_text = urlencode("Hello " . $prescription->patient_first . ", here is your prescription from " . $prescription->clinic_name . ": " . $public_link);
+        $telegram_text = urlencode("Hello " . $prescription->patient_first . ", here is your prescription from " . $prescription->clinic_name . ": ") . "&url=" . urlencode($public_link);
+
+        $data = [
+            'prescription' => $prescription,
+            'whatsapp_link' => "https://wa.me/?text=" . $whatsapp_text,
+            'telegram_link' => "https://t.me/share/url?text=" . $telegram_text
+        ];
+
+        $this->view('clinic/prescription', $data);
     }
 }
