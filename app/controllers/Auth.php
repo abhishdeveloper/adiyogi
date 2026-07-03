@@ -78,7 +78,7 @@ class Auth extends Controller {
     }
 
     // Generic registration dispatcher
-    public function register() {
+    public function register_choice() {
         $this->view('auth/register_choice');
     }
 
