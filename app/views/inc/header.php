@@ -19,9 +19,20 @@
                     <i id="theme-toggle-dark-icon" class="hidden fa-solid fa-moon"></i>
                     <i id="theme-toggle-light-icon" class="hidden fa-solid fa-sun"></i>
                 </button>
-                <a href="#" class="hidden md:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors shadow-sm">
-                    Register Clinic
-                </a>
+
+                <?php if(isset($_SESSION['user_id'])): ?>
+                    <a href="<?php echo $_SESSION['user_role'] == 'clinic' ? '/clinicdashboard' : '/patientdashboard'; ?>" class="hidden md:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors shadow-sm">
+                        Dashboard
+                    </a>
+                <?php else: ?>
+                    <a href="/auth/login" class="hidden md:inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm">
+                        Login
+                    </a>
+                    <a href="/auth/register_choice" class="hidden md:inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors shadow-sm">
+                        Register
+                    </a>
+                <?php endif; ?>
+
                 <div class="flex items-center md:hidden">
                     <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary" aria-expanded="false">
                         <span class="sr-only">Open main menu</span>
