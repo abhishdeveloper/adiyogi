@@ -367,7 +367,15 @@ class Auth extends Controller {
         $_SESSION['user_email'] = $user->email;
         $_SESSION['user_role'] = $user->role;
         $_SESSION['user_name'] = $user->first_name . ' ' . $user->last_name;
-        header('location: /dashboard');
+
+        if ($user->role == 'clinic') {
+            header('location: /clinicdashboard/index');
+        } elseif ($user->role == 'superadmin') {
+            header('location: /admin/index');
+        } else {
+            header('location: /patientdashboard/index');
+        }
+        exit;
     }
 
     public function logout() {
