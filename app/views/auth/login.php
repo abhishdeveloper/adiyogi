@@ -7,7 +7,7 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
             Or
-            <a href="/auth/register" class="font-medium text-primary hover:text-secondary transition-colors">
+            <a href="/auth/register_choice" class="font-medium text-primary hover:text-secondary transition-colors">
                 create a new account
             </a>
         </p>
