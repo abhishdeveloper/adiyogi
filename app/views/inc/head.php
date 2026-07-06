@@ -40,6 +40,19 @@
 </head>
 <body class="bg-gray-50 text-gray-900 dark:bg-dark dark:text-gray-100 transition-colors duration-300">
 
+    <!-- Global Page Loader / Splash Screen -->
+    <div id="page-loader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white dark:bg-dark transition-opacity duration-500">
+        <div class="relative flex items-center justify-center">
+            <!-- Pulsing outer ring -->
+            <div class="absolute inset-0 rounded-full animate-ping border-4 border-primary opacity-20 h-24 w-24"></div>
+            <!-- Main icon -->
+            <div class="h-20 w-20 bg-blue-50 dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg relative z-10 animate-bounce">
+                <i class="fa-solid fa-staff-snake text-primary text-4xl"></i>
+            </div>
+        </div>
+        <h2 class="mt-6 text-xl font-bold text-gray-900 dark:text-white tracking-widest uppercase animate-pulse">MedClinic<span class="text-primary">Pro</span></h2>
+    </div>
+
     <!-- Header / Navbar -->
     <?php require APP_ROOT . '/app/views/inc/header.php'; ?>
 

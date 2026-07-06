@@ -59,3 +59,42 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(el);
     });
 });
+
+// Page Loader / Splash Screen Logic
+window.addEventListener('load', function() {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        // Add a slight delay for visual effect
+        setTimeout(() => {
+            loader.classList.add('opacity-0');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                loader.style.display = 'none';
+            }, 500); // Wait for transition to finish
+        }, 500);
+    }
+});
+
+// Show loader when navigating to new pages (except anchor links or new tabs)
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('a');
+    if (target && target.href) {
+        const url = new URL(target.href);
+        // If it's internal, not an anchor link, and not a _blank target
+        if (
+            url.origin === window.location.origin &&
+            !target.href.includes('#') &&
+            target.getAttribute('target') !== '_blank' &&
+            !target.hasAttribute('download')
+        ) {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.display = 'flex';
+                loader.classList.remove('hidden');
+                // Force reflow
+                void loader.offsetWidth;
+                loader.classList.remove('opacity-0');
+            }
+        }
+    }
+});
