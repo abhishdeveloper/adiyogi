@@ -25,7 +25,10 @@ class Clinicdashboard extends Controller {
             'title' => 'Clinic Dashboard',
             'clinic' => $clinic,
             'appointments' => $this->appointmentModel->getClinicAppointments($clinic->id),
-            'earnings' => $this->appointmentModel->getClinicEarnings($clinic->id)
+            'earnings' => $this->appointmentModel->getClinicEarnings($clinic->id),
+            'weekly_stats' => $this->appointmentModel->getWeeklyAppointmentsStats($clinic->id),
+            'monthly_earnings' => $this->appointmentModel->getMonthlyEarningsStats($clinic->id),
+            'demographics' => $this->appointmentModel->getPatientDemographics($clinic->id)
         ];
 
         $this->view('clinic/index', $data);

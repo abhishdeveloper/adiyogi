@@ -67,8 +67,25 @@
             </div>
         </div>
 
+        <!-- Analytics Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-base leading-6 font-medium text-gray-900 dark:text-white mb-4">Earnings Overview (Last 6 Months)</h3>
+                <div class="relative h-64 w-full">
+                    <canvas id="earningsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 border border-gray-100 dark:border-gray-700">
+                <h3 class="text-base leading-6 font-medium text-gray-900 dark:text-white mb-4">Patient Demographics</h3>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="demographicsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg border border-gray-200 dark:border-gray-700">
-            <div class="px-4 py-5 sm:px-6">
+            <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Recent Appointments</h3>
             </div>
             <div class="border-t border-gray-200 dark:border-gray-700">
@@ -111,4 +128,76 @@
     </div>
 </div>
 
+<?php require APP_ROOT . '/app/views/inc/tail.php'; ?>
+
+<!-- Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const monthlyEarningsData = <?php echo json_encode($data['monthly_earnings']); ?>;
+    const demographicsData = <?php echo json_encode($data['demographics']); ?>;
+
+    // --- Earnings Chart (Bar) ---
+    const earningLabels = monthlyEarningsData.map(item => {
+        const d = new Date(item.month_year + '-01');
+        return d.toLocaleDateString('default', { month: 'short', year: 'numeric' });
+    });
+    const earningValues = monthlyEarningsData.map(item => parseFloat(item.total));
+
+    const ctxEarnings = document.getElementById('earningsChart');
+    if (ctxEarnings) {
+        new Chart(ctxEarnings.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: earningLabels.length > 0 ? earningLabels : ['No Data'],
+                datasets: [{
+                    label: 'Earnings (₹)',
+                    data: earningValues.length > 0 ? earningValues : [0],
+                    backgroundColor: '#0ea5e9',
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(156, 163, 175, 0.1)' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // --- Demographics Chart (Doughnut) ---
+    const demoLabels = demographicsData.map(item => item.gender ? item.gender.charAt(0).toUpperCase() + item.gender.slice(1) : 'Unknown');
+    const demoValues = demographicsData.map(item => parseInt(item.count));
+
+    const ctxDemo = document.getElementById('demographicsChart');
+    if (ctxDemo) {
+        new Chart(ctxDemo.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: demoLabels.length > 0 ? demoLabels : ['No Data'],
+                datasets: [{
+                    data: demoValues.length > 0 ? demoValues : [1],
+                    backgroundColor: ['#0ea5e9', '#ec4899', '#8b5cf6', '#cbd5e1'],
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+});
+</script>
 <?php require APP_ROOT . '/app/views/inc/tail.php'; ?>

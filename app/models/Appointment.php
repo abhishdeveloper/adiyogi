@@ -68,4 +68,44 @@ class Appointment {
         $result = $this->db->single();
         return $result->total ? $result->total : 0.00;
     }
-}
+
+    // --- Analytics Methods --- //
+
+    // Get appointments count for the last 7 days
+    public function getWeeklyAppointmentsStats($clinic_id) {
+        $this->db->query("
+            SELECT DATE(appointment_datetime) as app_date, COUNT(*) as count
+            FROM appointments
+            WHERE clinic_id = :clinic_id AND appointment_datetime >= DATE(NOW()) - INTERVAL 7 DAY
+            GROUP BY DATE(appointment_datetime)
+            ORDER BY app_date ASC
+        ");
+        $this->db->bind(':clinic_id', $clinic_id);
+        return $this->db->resultSet();
+    }
+
+    // Get monthly earnings for the last 6 months
+    public function getMonthlyEarningsStats($clinic_id) {
+        $this->db->query("
+            SELECT DATE_FORMAT(created_at, '%Y-%m') as month_year, SUM(amount) as total
+            FROM appointments
+            WHERE clinic_id = :clinic_id AND payment_status = 'paid' AND created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+            GROUP BY month_year
+            ORDER BY month_year ASC
+        ");
+        $this->db->bind(':clinic_id', $clinic_id);
+        return $this->db->resultSet();
+    }
+
+    // Get patient demographics (Gender breakdown)
+    public function getPatientDemographics($clinic_id) {
+        $this->db->query("
+            SELECT pp.gender, COUNT(DISTINCT a.patient_user_id) as count
+            FROM appointments a
+            JOIN patient_profiles pp ON a.patient_user_id = pp.user_id
+            WHERE a.clinic_id = :clinic_id AND pp.gender IS NOT NULL
+            GROUP BY pp.gender
+        ");
+        $this->db->bind(':clinic_id', $clinic_id);
+        return $this->db->resultSet();
+    }
