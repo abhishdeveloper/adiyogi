@@ -308,3 +308,124 @@ class Clinicdashboard extends Controller {
         $this->view('clinic/prescription', $data);
     }
 }
+
+    // --- FullCalendar Integration --- //
+
+    // Load Calendar View
+    public function calendar() {
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $data = ['clinic' => $clinic];
+        $this->view('clinic/calendar', $data);
+    }
+
+    // API Endpoint: Get Events (Appointments & Blocks)
+    public function api_events() {
+        if($_SERVER['REQUEST_METHOD'] != 'GET') die();
+
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+
+        $start = $_GET['start'] ?? date('Y-m-01');
+        $end = $_GET['end'] ?? date('Y-m-t');
+
+        $appointments = $this->appointmentModel->getClinicAppointmentsByRange($clinic->id, $start, $end);
+
+        // Need to load ClinicBlock model
+        $blockModel = $this->model('ClinicBlock');
+        $blocks = $blockModel->getBlockedTimes($clinic->id, $start, $end);
+
+        $events = [];
+
+        foreach($appointments as $app) {
+            $events[] = [
+                'id' => 'app_' . $app->id,
+                'title' => $app->first_name . ' ' . $app->last_name,
+                'start' => $app->appointment_datetime,
+                // Defaulting appointments to 30 mins duration for UI
+                'end' => date('Y-m-d\TH:i:s', strtotime($app->appointment_datetime) + 1800),
+                'backgroundColor' => $app->status == 'confirmed' ? '#10b981' : '#f59e0b',
+                'borderColor' => 'transparent',
+                'extendedProps' => ['type' => 'appointment']
+            ];
+        }
+
+        foreach($blocks as $block) {
+            $events[] = [
+                'id' => 'blk_' . $block->id,
+                'title' => $block->reason,
+                'start' => $block->start_datetime,
+                'end' => $block->end_datetime,
+                'backgroundColor' => '#ef4444',
+                'borderColor' => 'transparent',
+                'extendedProps' => ['type' => 'block']
+            ];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($events);
+    }
+
+    // API Endpoint: Update Appointment Time (Drag and Drop)
+    public function api_update_event() {
+        if($_SERVER['REQUEST_METHOD'] != 'POST') die();
+
+        $headers = getallheaders();
+        $csrf_token = $_POST['csrf_token'] ?? $headers['X-CSRF-Token'] ?? '';
+        if (!$this->validateCsrfToken($csrf_token)) {
+            http_response_code(403);
+            echo json_encode(['error' => 'CSRF validation failed']);
+            die();
+        }
+
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $event_id = $_POST['event_id'] ?? '';
+        $new_start = $_POST['new_start'] ?? '';
+
+        if(strpos($event_id, 'app_') === 0) {
+            $app_id = str_replace('app_', '', $event_id);
+            // Convert JS ISO string to MySQL datetime
+            $new_datetime = date('Y-m-d H:i:s', strtotime($new_start));
+
+            if($this->appointmentModel->updateAppointmentTime($app_id, $clinic->id, $new_datetime)) {
+                echo json_encode(['success' => true]);
+                die();
+            }
+        }
+
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to update event']);
+    }
+
+    // API Endpoint: Add Blocked Time
+    public function api_add_block() {
+        if($_SERVER['REQUEST_METHOD'] != 'POST') die();
+
+        $headers = getallheaders();
+        $csrf_token = $_POST['csrf_token'] ?? $headers['X-CSRF-Token'] ?? '';
+        if (!$this->validateCsrfToken($csrf_token)) {
+            http_response_code(403);
+            echo json_encode(['error' => 'CSRF validation failed']);
+            die();
+        }
+
+        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $start = $_POST['start'] ?? '';
+        $end = $_POST['end'] ?? '';
+        $reason = $_POST['reason'] ?? 'Personal Time';
+
+        $blockModel = $this->model('ClinicBlock');
+
+        $data = [
+            'clinic_id' => $clinic->id,
+            'start_datetime' => date('Y-m-d H:i:s', strtotime($start)),
+            'end_datetime' => date('Y-m-d H:i:s', strtotime($end)),
+            'reason' => $reason
+        ];
+
+        if($blockModel->blockTime($data)) {
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to block time']);
+        }
+    }
+}
