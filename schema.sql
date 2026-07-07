@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `google_id` varchar(255) DEFAULT NULL,
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -94,7 +95,8 @@ INSERT INTO `settings` (`setting_key`, `setting_value`) VALUES
 ('google_client_secret', ''),
 ('razorpay_key_id', ''),
 ('razorpay_key_secret', ''),
-('global_payment_preference', 'both');
+('global_payment_preference', 'both'),
+('sms_api_key', '');
 
 CREATE TABLE IF NOT EXISTS `prescriptions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

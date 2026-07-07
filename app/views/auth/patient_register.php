@@ -23,6 +23,11 @@
                 </div>
 
                 <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone Number (WhatsApp/SMS)</label>
+                    <input id="phone" name="phone" type="text" value="<?php echo htmlspecialchars($data['phone'] ?? ''); ?>" required class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm sm:text-sm dark:bg-gray-700 dark:text-white">
+                </div>
+
+                <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email address</label>
                     <input id="email" name="email" type="email" value="<?php echo htmlspecialchars($data['email']); ?>" required class="mt-1 appearance-none block w-full px-3 py-2 border <?php echo (!empty($data['email_err'])) ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'; ?> rounded-md shadow-sm sm:text-sm dark:bg-gray-700 dark:text-white">
                     <span class="text-red-500 text-xs mt-1 block"><?php echo $data['email_err']; ?></span>

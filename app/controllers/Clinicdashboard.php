@@ -115,6 +115,7 @@ class Clinicdashboard extends Controller {
                 'first_name' => trim($_POST['first_name']),
                 'last_name' => trim($_POST['last_name']),
                 'email' => trim($_POST['email']),
+                'phone' => trim($_POST['phone'] ?? ''),
                 'appointment_datetime' => trim($_POST['appointment_datetime']),
                 'amount' => trim($_POST['amount']),
                 'error_msg' => ''
@@ -133,10 +134,18 @@ class Clinicdashboard extends Controller {
                     $this->db->bind(':email', $data['email']);
                     $patient = $this->db->single();
                     $patient_id = $patient->id;
+
+                    // Update phone if provided
+                    if (!empty($data['phone'])) {
+                        $this->db->query("UPDATE users SET phone = :phone WHERE id = :id");
+                        $this->db->bind(':phone', $data['phone']);
+                        $this->db->bind(':id', $patient_id);
+                        $this->db->execute();
+                    }
                 } else {
                     // Create basic patient profile
                     $default_password = bin2hex(random_bytes(8));
-                    $patient_id = $this->userModel->createPatientProfile($data['first_name'], $data['last_name'], $data['email'], $default_password);
+                    $patient_id = $this->userModel->createPatientProfile($data['first_name'], $data['last_name'], $data['email'], $default_password, $data['phone']);
                 }
 
                 if($patient_id) {

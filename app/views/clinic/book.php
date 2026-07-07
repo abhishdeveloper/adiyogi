@@ -51,6 +51,11 @@
                             <input type="email" name="email" required value="<?php echo htmlspecialchars($data['email']); ?>" class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary sm:text-sm border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
                         </div>
 
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Patient Phone (WhatsApp/SMS)</label>
+                            <input type="text" name="phone" value="<?php echo htmlspecialchars($data['phone'] ?? ''); ?>" class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary sm:text-sm border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Date & Time *</label>
                             <input type="datetime-local" name="appointment_datetime" required value="<?php echo htmlspecialchars($data['appointment_datetime']); ?>" class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary sm:text-sm border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">

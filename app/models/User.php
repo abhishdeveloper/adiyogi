@@ -8,13 +8,14 @@ class User {
 
     // Register a new user
     public function register($data) {
-        $this->db->query('INSERT INTO users (role, email, password, first_name, last_name, is_active) VALUES (:role, :email, :password, :first_name, :last_name, :is_active)');
+        $this->db->query('INSERT INTO users (role, email, password, first_name, last_name, phone, is_active) VALUES (:role, :email, :password, :first_name, :last_name, :phone, :is_active)');
 
         $this->db->bind(':role', $data['role']);
         $this->db->bind(':email', $data['email']);
         $this->db->bind(':password', $data['password']);
         $this->db->bind(':first_name', $data['first_name']);
         $this->db->bind(':last_name', $data['last_name']);
+        $this->db->bind(':phone', isset($data['phone']) ? $data['phone'] : null);
 
         // Clinics/Doctors are inactive until verified by superadmin
         // Patients are active immediately
@@ -102,13 +103,14 @@ class User {
     }
 
     // Doctor creates a patient profile (basic)
-    public function createPatientProfile($first_name, $last_name, $email, $password) {
-        $this->db->query('INSERT INTO users (role, email, password, first_name, last_name, is_active) VALUES ("patient", :email, :password, :first_name, :last_name, 1)');
+    public function createPatientProfile($first_name, $last_name, $email, $password, $phone = null) {
+        $this->db->query('INSERT INTO users (role, email, password, first_name, last_name, phone, is_active) VALUES ("patient", :email, :password, :first_name, :last_name, :phone, 1)');
 
         $this->db->bind(':email', $email);
         $this->db->bind(':password', password_hash($password, PASSWORD_BCRYPT));
         $this->db->bind(':first_name', $first_name);
         $this->db->bind(':last_name', $last_name);
+        $this->db->bind(':phone', $phone);
 
         if ($this->db->execute()) {
             return $this->db->lastInsertId();
