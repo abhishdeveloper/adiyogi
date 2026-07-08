@@ -10,7 +10,16 @@
                 </h2>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?></p>
             </div>
-            <div class="mt-4 flex md:mt-0 md:ml-4">
+            <div class="mt-4 flex md:mt-0 md:ml-4 gap-3">
+                <a href="/patientdashboard/records" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors hidden md:inline-flex">
+                    <i class="fa-solid fa-file-medical mr-2"></i> Records
+                </a>
+                <a href="/patientdashboard/billing" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors hidden md:inline-flex">
+                    <i class="fa-solid fa-receipt mr-2"></i> Billing
+                </a>
+                <a href="/patientdashboard/profile" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary transition-colors hidden md:inline-flex">
+                    <i class="fa-solid fa-notes-medical mr-2"></i> Medical Profile
+                </a>
                 <a href="/auth/logout" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
                     Logout
                 </a>

@@ -31,4 +31,15 @@ class Prescription extends Controller {
         $this->db->bind(':aid', $appointment_id);
         return $this->db->single();
     }
+
+    public function getPatientPrescriptions($patient_id) {
+        $this->db->query("SELECT p.*, c.clinic_name, a.appointment_datetime
+                          FROM prescriptions p
+                          JOIN clinics c ON p.clinic_id = c.id
+                          JOIN appointments a ON p.appointment_id = a.id
+                          WHERE p.patient_user_id = :pid
+                          ORDER BY a.appointment_datetime DESC");
+        $this->db->bind(':pid', $patient_id);
+        return $this->db->resultSet();
+    }
 }

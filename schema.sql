@@ -213,3 +213,16 @@ CREATE TABLE IF NOT EXISTS `clinic_blocked_time` (
   KEY `clinic_id` (`clinic_id`),
   CONSTRAINT `fk_blocked_clinic` FOREIGN KEY (`clinic_id`) REFERENCES `clinics` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `patient_lab_reports` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `patient_user_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `report_date` date DEFAULT NULL,
+  `notes` text,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `patient_user_id` (`patient_user_id`),
+  CONSTRAINT `fk_lab_report_patient` FOREIGN KEY (`patient_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

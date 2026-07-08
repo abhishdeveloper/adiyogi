@@ -231,4 +231,66 @@ class PatientDashboard extends Controller {
             }
         }
     }
+
+    // Medical Records & Lab Reports
+    public function records() {
+        $medicalRecordModel = $this->model('MedicalRecord');
+        $prescriptionModel = $this->model('Prescription');
+
+        // Handle file upload
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$this->validateCsrfToken($_POST['csrf_token'])) {
+                die("CSRF token validation failed.");
+            }
+
+            if(isset($_POST['action']) && $_POST['action'] == 'upload') {
+                $file_path = null;
+                if(isset($_FILES['report_file']) && $_FILES['report_file']['error'] == 0) {
+                    $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
+                    $filename = $_FILES['report_file']['name'];
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+                    if(in_array($ext, $allowed) && $_FILES['report_file']['size'] < 10000000) { // 10MB limit
+                        $new_filename = uniqid('report_') . '.' . $ext;
+                        $upload_path = APP_ROOT . '/assets/uploads/reports/' . $new_filename;
+                        if(move_uploaded_file($_FILES['report_file']['tmp_name'], $upload_path)) {
+                            $file_path = $new_filename;
+                        }
+                    }
+                }
+
+                if($file_path) {
+                    $data = [
+                        'patient_user_id' => $_SESSION['user_id'],
+                        'title' => trim($_POST['title']),
+                        'file_path' => $file_path,
+                        'report_date' => trim($_POST['report_date']),
+                        'notes' => trim($_POST['notes'] ?? '')
+                    ];
+                    $medicalRecordModel->addReport($data);
+                    header('location: /patientdashboard/records?success=uploaded');
+                    die();
+                } else {
+                    header('location: /patientdashboard/records?error=uploadfailed');
+                    die();
+                }
+            } elseif(isset($_POST['action']) && $_POST['action'] == 'delete') {
+                $medicalRecordModel->deleteReport($_POST['report_id'], $_SESSION['user_id']);
+                header('location: /patientdashboard/records?success=deleted');
+                die();
+            }
+        }
+
+        $prescriptions = $prescriptionModel->getPatientPrescriptions($_SESSION['user_id']);
+        $reports = $medicalRecordModel->getPatientReports($_SESSION['user_id']);
+
+        $data = [
+            'prescriptions' => $prescriptions,
+            'reports' => $reports,
+            'success_msg' => isset($_GET['success']) ? 'Action completed successfully.' : '',
+            'error_msg' => isset($_GET['error']) ? 'An error occurred during file upload.' : ''
+        ];
+
+        $this->view('patient/records', $data);
+    }
 }
