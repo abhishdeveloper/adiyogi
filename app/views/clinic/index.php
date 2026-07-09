@@ -11,14 +11,26 @@
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Manage your appointments, profile, and earnings.</p>
             </div>
             <div class="mt-4 flex md:mt-0 md:ml-4 gap-3">
-                <a href="/profile/show/<?php echo htmlspecialchars($data['clinic']->url_slug); ?>" target="_blank" class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
-                    <i class="fa-solid fa-eye mr-2"></i> View Public Profile
-                </a>
-                <a href="/clinicdashboard/profile" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none transition-colors">
-                    <i class="fa-solid fa-user-pen mr-2"></i> Edit Profile
+                <?php if(!isset($data['clinic']->staff_role)): // Only Owner sees this ?>
+                    <a href="/clinicdashboard/billing" class="hidden lg:inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
+                        <i class="fa-solid fa-file-invoice-dollar mr-2"></i> Billing
+                    </a>
+                    <a href="/clinicdashboard/doctors" class="hidden lg:inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
+                        <i class="fa-solid fa-user-doctor mr-2"></i> Doctors
+                    </a>
+                    <a href="/clinicdashboard/staff" class="hidden lg:inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none transition-colors">
+                        <i class="fa-solid fa-users-gear mr-2"></i> Staff
+                    </a>
+                    <a href="/clinicdashboard/profile" class="hidden md:inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none transition-colors">
+                        <i class="fa-solid fa-user-pen mr-2"></i> Edit Profile
+                    </a>
+                <?php endif; ?>
+
+                <a href="/clinicdashboard/calendar" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none transition-colors">
+                    <i class="fa-solid fa-calendar-alt mr-2"></i> Calendar
                 </a>
                 <a href="/clinicdashboard/book" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none transition-colors">
-                    <i class="fa-solid fa-plus mr-2"></i> New Appointment
+                    <i class="fa-solid fa-plus mr-2"></i> New Appt
                 </a>
             </div>
         </div>
@@ -38,6 +50,7 @@
                 </div>
             </div>
 
+            <?php if(!isset($data['clinic']->staff_role)): // Only Owner sees this ?>
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700 p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0 bg-green-100 dark:bg-green-900 rounded-md p-3">
@@ -51,6 +64,7 @@
                     </div>
                 </div>
             </div>
+            <?php endif; ?>
 
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg border border-gray-100 dark:border-gray-700 p-5">
                 <div class="flex items-center">
@@ -67,6 +81,7 @@
             </div>
         </div>
 
+        <?php if(!isset($data['clinic']->staff_role)): // Only Owner sees this ?>
         <!-- Analytics Charts -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-5 border border-gray-100 dark:border-gray-700">
@@ -83,6 +98,7 @@
                 </div>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
@@ -128,8 +144,7 @@
     </div>
 </div>
 
-<?php require APP_ROOT . '/app/views/inc/tail.php'; ?>
-
+<?php if(!isset($data['clinic']->staff_role)): // Only run charts if owner ?>
 <!-- Chart.js via CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -200,4 +215,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<?php endif; ?>
 <?php require APP_ROOT . '/app/views/inc/tail.php'; ?>

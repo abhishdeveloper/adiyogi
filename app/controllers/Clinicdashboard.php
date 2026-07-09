@@ -5,21 +5,41 @@ class Clinicdashboard extends Controller {
     private $userModel;
 
     public function __construct() {
-        if(!isset($_SESSION['user_id']) || $_SESSION['user_role'] != 'clinic') {
+        if(!isset($_SESSION['user_id']) || ($_SESSION['user_role'] != 'clinic' && $_SESSION['user_role'] != 'staff')) {
             header('location: /auth/login');
-            exit;
-        }
+            die();
+
 
         $this->clinicModel = $this->model('Clinic');
         $this->appointmentModel = $this->model('Appointment');
         $this->userModel = $this->model('User');
         $this->presavedModel = $this->model('PresavedItem');
         $this->prescriptionModel = $this->model('Prescription');
-    }
+        $this->staffModel = $this->model('Staff');
+
+
+    // Helper to get clinic object whether user is clinic owner or staff
+    private function getClinicContext() {
+        if($_SESSION['user_role'] == 'staff') {
+            $staffDetails = $this->staffModel->getStaffDetails($_SESSION['user_id']);
+            return $staffDetails; // Returns clinic object + staff_role
+        } else {
+            $clinic = $this->getClinicContext();
+            $clinic->staff_role = 'owner';
+            return $clinic;
+
+
+
+    // Authorization helper
+    private function requireOwner() {
+        if($_SESSION['user_role'] == 'staff') {
+            die("Access Denied: Clinic Owners Only.");
+
+
 
     // Dashboard Overview
     public function index() {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
 
         $data = [
             'title' => 'Clinic Dashboard',
@@ -32,16 +52,17 @@ class Clinicdashboard extends Controller {
         ];
 
         $this->view('clinic/index', $data);
-    }
+
 
     // Update Digital Profile
     public function profile() {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $this->requireOwner();
+        $clinic = $this->getClinicContext();
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$this->validateCsrfToken($_POST['csrf_token'])) {
                 die("CSRF token validation failed.");
-            }
+
 
             $_POST = filter_input_array(INPUT_POST, FILTER_DEFAULT);
 
@@ -57,9 +78,9 @@ class Clinicdashboard extends Controller {
                     $upload_path = APP_ROOT . '/assets/uploads/profiles/' . $new_filename;
                     if(move_uploaded_file($_FILES['profile_image']['tmp_name'], $upload_path)) {
                         $profile_image = $new_filename;
-                    }
-                }
-            }
+
+
+
 
             $social_links = [
                 'instagram' => trim($_POST['instagram'] ?? ''),
@@ -82,10 +103,10 @@ class Clinicdashboard extends Controller {
                 $data['success_msg'] = 'Profile updated successfully.';
             } else {
                 $data['error_msg'] = 'Something went wrong.';
-            }
 
-            $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
-        }
+
+            $clinic = $this->getClinicContext();
+
 
         $socials = json_decode($clinic->social_links, true) ?: ['instagram'=>'', 'facebook'=>'', 'linkedin'=>'', 'website'=>''];
 
@@ -97,16 +118,16 @@ class Clinicdashboard extends Controller {
         ];
 
         $this->view('clinic/profile', $data);
-    }
+
 
     // Book new appointment & create patient
     public function book() {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$this->validateCsrfToken($_POST['csrf_token'])) {
                 die("CSRF token validation failed.");
-            }
+
 
             $_POST = filter_input_array(INPUT_POST, FILTER_DEFAULT);
 
@@ -141,12 +162,12 @@ class Clinicdashboard extends Controller {
                         $this->db->bind(':phone', $data['phone']);
                         $this->db->bind(':id', $patient_id);
                         $this->db->execute();
-                    }
+
                 } else {
                     // Create basic patient profile
                     $default_password = bin2hex(random_bytes(8));
                     $patient_id = $this->userModel->createPatientProfile($data['first_name'], $data['last_name'], $data['email'], $default_password, $data['phone']);
-                }
+
 
                 if($patient_id) {
                     $appointmentData = [
@@ -170,11 +191,11 @@ class Clinicdashboard extends Controller {
                         exit;
                     } else {
                         $data['error_msg'] = 'Failed to create appointment record.';
-                    }
+
                 } else {
                     $data['error_msg'] = 'Failed to create patient profile.';
-                }
-            }
+
+
 
             $this->view('clinic/book', $data);
 
@@ -185,17 +206,17 @@ class Clinicdashboard extends Controller {
                 'error_msg' => ''
             ];
             $this->view('clinic/book', $data);
-        }
-    }
+
+
 
     // Manage Presaved Items (Medicines, Diets, Templates)
     public function presaved() {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$this->validateCsrfToken($_POST['csrf_token'])) {
                 die("CSRF token validation failed.");
-            }
+
 
             if(isset($_POST['action']) && $_POST['action'] == 'add') {
                 $data = [
@@ -207,11 +228,11 @@ class Clinicdashboard extends Controller {
                 $this->presavedModel->addItem($data);
             } elseif(isset($_POST['action']) && $_POST['action'] == 'delete') {
                 $this->presavedModel->deleteItem($_POST['item_id'], $clinic->id);
-            }
+
 
             header('location: /clinicdashboard/presaved');
             exit;
-        }
+
 
         $items = $this->presavedModel->getItemsByClinic($clinic->id);
 
@@ -221,28 +242,28 @@ class Clinicdashboard extends Controller {
         ];
 
         $this->view('clinic/presaved', $data);
-    }
+
 
     // Attend Appointment (Write Prescription & Chat)
     public function attend($appointment_id) {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
         $appointment = $this->appointmentModel->getAppointmentById($appointment_id);
 
         if(!$appointment || $appointment->clinic_id != $clinic->id) {
             die("Invalid appointment.");
-        }
+
 
         // Check if prescription already exists
         $existing = $this->prescriptionModel->getByAppointment($appointment_id);
         if($existing) {
             header("location: /clinicdashboard/view_prescription/" . $appointment_id);
             exit;
-        }
+
 
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$this->validateCsrfToken($_POST['csrf_token'])) {
                 die("CSRF token validation failed.");
-            }
+
 
             $prescData = [
                 'appointment_id' => $appointment_id,
@@ -267,8 +288,8 @@ class Clinicdashboard extends Controller {
 
                 header("location: /clinicdashboard/view_prescription/" . $appointment_id);
                 exit;
-            }
-        }
+
+
 
         // Load presaved items for quick insertion
         $presaved = [
@@ -284,15 +305,15 @@ class Clinicdashboard extends Controller {
         ];
 
         $this->view('clinic/attend', $data);
-    }
+
 
     public function view_prescription($appointment_id) {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
         $prescription = $this->prescriptionModel->getByAppointment($appointment_id);
 
         if(!$prescription || $prescription->clinic_id != $clinic->id) {
             die("Prescription not found.");
-        }
+
 
         // Generate sharing links
         $public_link = APP_URL . "/patientdashboard/prescription/" . $appointment_id; // Will implement secure patient view
@@ -306,23 +327,23 @@ class Clinicdashboard extends Controller {
         ];
 
         $this->view('clinic/prescription', $data);
-    }
-}
+
+
 
     // --- FullCalendar Integration --- //
 
     // Load Calendar View
     public function calendar() {
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
         $data = ['clinic' => $clinic];
         $this->view('clinic/calendar', $data);
-    }
+
 
     // API Endpoint: Get Events (Appointments & Blocks)
     public function api_events() {
         if($_SERVER['REQUEST_METHOD'] != 'GET') die();
 
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+        $clinic = $this->getClinicContext();
 
         $start = $_GET['start'] ?? date('Y-m-01');
         $end = $_GET['end'] ?? date('Y-m-t');
@@ -346,7 +367,7 @@ class Clinicdashboard extends Controller {
                 'borderColor' => 'transparent',
                 'extendedProps' => ['type' => 'appointment']
             ];
-        }
+
 
         foreach($blocks as $block) {
             $events[] = [
@@ -358,11 +379,11 @@ class Clinicdashboard extends Controller {
                 'borderColor' => 'transparent',
                 'extendedProps' => ['type' => 'block']
             ];
-        }
+
 
         header('Content-Type: application/json');
         echo json_encode($events);
-    }
+
 
     // API Endpoint: Update Appointment Time (Drag and Drop)
     public function api_update_event() {
@@ -374,9 +395,9 @@ class Clinicdashboard extends Controller {
             http_response_code(403);
             echo json_encode(['error' => 'CSRF validation failed']);
             die();
-        }
 
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+
+        $clinic = $this->getClinicContext();
         $event_id = $_POST['event_id'] ?? '';
         $new_start = $_POST['new_start'] ?? '';
 
@@ -388,12 +409,12 @@ class Clinicdashboard extends Controller {
             if($this->appointmentModel->updateAppointmentTime($app_id, $clinic->id, $new_datetime)) {
                 echo json_encode(['success' => true]);
                 die();
-            }
-        }
+
+
 
         http_response_code(500);
         echo json_encode(['error' => 'Failed to update event']);
-    }
+
 
     // API Endpoint: Add Blocked Time
     public function api_add_block() {
@@ -405,9 +426,9 @@ class Clinicdashboard extends Controller {
             http_response_code(403);
             echo json_encode(['error' => 'CSRF validation failed']);
             die();
-        }
 
-        $clinic = $this->clinicModel->getClinicByUserId($_SESSION['user_id']);
+
+        $clinic = $this->getClinicContext();
         $start = $_POST['start'] ?? '';
         $end = $_POST['end'] ?? '';
         $reason = $_POST['reason'] ?? 'Personal Time';
@@ -426,6 +447,57 @@ class Clinicdashboard extends Controller {
         } else {
             http_response_code(500);
             echo json_encode(['error' => 'Failed to block time']);
-        }
-    }
+
+
+
+
+    // Manage Clinic Staff
+    public function staff() {
+        $this->requireOwner();
+        $clinic = $this->getClinicContext();
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$this->validateCsrfToken($_POST['csrf_token'])) {
+                die("CSRF token validation failed.");
+
+
+            if(isset($_POST['action']) && $_POST['action'] == 'add') {
+                $data = [
+                    'clinic_id' => $clinic->id,
+                    'first_name' => trim($_POST['first_name']),
+                    'last_name' => trim($_POST['last_name']),
+                    'email' => trim($_POST['email']),
+                    'password' => trim($_POST['password']),
+                    'staff_role' => trim($_POST['staff_role'])
+                ];
+
+                if($this->userModel->findUserByEmail($data['email'])) {
+                    header('location: /clinicdashboard/staff?error=emailexists');
+                    die();
+
+
+                if($this->staffModel->addStaff($data)) {
+                    header('location: /clinicdashboard/staff?success=added');
+                } else {
+                    header('location: /clinicdashboard/staff?error=failed');
+
+                die();
+            } elseif(isset($_POST['action']) && $_POST['action'] == 'delete') {
+                $this->staffModel->removeStaff($_POST['staff_user_id'], $clinic->id);
+                header('location: /clinicdashboard/staff?success=removed');
+                die();
+
+
+
+        $staff_members = $this->staffModel->getClinicStaff($clinic->id);
+
+        $data = [
+            'clinic' => $clinic,
+            'staff' => $staff_members,
+            'success_msg' => isset($_GET['success']) ? 'Action completed successfully.' : '',
+            'error_msg' => isset($_GET['error']) ? 'An error occurred (email might be in use).' : ''
+        ];
+
+        $this->view('clinic/staff', $data);
+
 }

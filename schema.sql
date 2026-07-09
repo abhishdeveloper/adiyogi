@@ -2,7 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `role` enum('superadmin','clinic','patient') NOT NULL DEFAULT 'patient',
+  `role` enum('superadmin','clinic','patient','staff') NOT NULL DEFAULT 'patient',
   `email` varchar(255) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
   `google_id` varchar(255) DEFAULT NULL,
@@ -225,4 +225,17 @@ CREATE TABLE IF NOT EXISTS `patient_lab_reports` (
   PRIMARY KEY (`id`),
   KEY `patient_user_id` (`patient_user_id`),
   CONSTRAINT `fk_lab_report_patient` FOREIGN KEY (`patient_user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `clinic_staff` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clinic_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `staff_role` enum('receptionist','nurse') NOT NULL DEFAULT 'receptionist',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_id` (`user_id`),
+  KEY `clinic_id` (`clinic_id`),
+  CONSTRAINT `fk_staff_clinic` FOREIGN KEY (`clinic_id`) REFERENCES `clinics` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_staff_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

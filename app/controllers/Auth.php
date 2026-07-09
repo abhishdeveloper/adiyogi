@@ -369,7 +369,7 @@ class Auth extends Controller {
         $_SESSION['user_role'] = $user->role;
         $_SESSION['user_name'] = $user->first_name . ' ' . $user->last_name;
 
-        if ($user->role == 'clinic') {
+        if ($user->role == 'clinic' || $user->role == 'staff') {
             header('location: /clinicdashboard/index');
         } elseif ($user->role == 'superadmin') {
             header('location: /admin/index');
