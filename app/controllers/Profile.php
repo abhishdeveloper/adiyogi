@@ -24,7 +24,10 @@ class Profile extends Controller {
         $data = [
             'title' => htmlspecialchars($clinic->clinic_name) . ' - Profile',
             'clinic' => $clinic,
-            'socials' => $socials
+            'socials' => $socials,
+            'seo_title' => !empty($clinic->seo_title) ? htmlspecialchars($clinic->seo_title) : htmlspecialchars($clinic->clinic_name) . ' - Profile',
+            'seo_description' => !empty($clinic->seo_description) ? htmlspecialchars($clinic->seo_description) : htmlspecialchars($clinic->bio ?? ''),
+            'seo_og_image' => !empty($clinic->seo_og_image) ? $clinic->seo_og_image : null
         ];
 
         // Determine which theme view to load
