@@ -293,20 +293,4 @@ class PatientDashboard extends Controller {
 
         $this->view('patient/records', $data);
     }
-
-
-    // Telemedicine Video Consultation (Patient)
-    public function telemedicine($appointment_id) {
-        $appointment = $this->appointmentModel->getAppointmentById($appointment_id);
-
-        if(!$appointment || $appointment->patient_user_id != $_SESSION['user_id'] || $appointment->consultation_type != 'video') {
-            die("Invalid video consultation session.");
-        }
-
-        $data = [
-            'appointment' => $appointment
-        ];
-
-        $this->view('patient/telemedicine', $data);
-    }
 }
