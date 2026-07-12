@@ -30,6 +30,14 @@
                             <p class="text-xs text-gray-500 mt-1">Please select your preferred time. The clinic will confirm availability.</p>
                         </div>
 
+                                                <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Consultation Type</label>
+                            <select name="consultation_type" required class="mt-1 block w-full shadow-sm focus:ring-primary focus:border-primary sm:text-sm border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                                <option value="in_person">In-Person (Clinic Visit)</option>
+                                <option value="video">Telemedicine (Video Call)</option>
+                            </select>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Method</label>
 

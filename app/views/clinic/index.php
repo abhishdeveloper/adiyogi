@@ -134,6 +134,17 @@
                                         <?php echo ucfirst($app->payment_method); ?> (<?php echo ucfirst($app->payment_status); ?>)
                                     </div>
                                 </div>
+                                <div class="mt-3 flex gap-2">
+                                    <?php if(isset($app->consultation_type) && $app->consultation_type == 'video'): ?>
+                                        <a href="/clinicdashboard/telemedicine/<?php echo $app->id; ?>" class="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700">
+                                            <i class="fa-solid fa-video mr-1.5"></i> Join Video Call
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="/clinicdashboard/attend/<?php echo $app->id; ?>" class="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700">
+                                            <i class="fa-solid fa-stethoscope mr-1.5"></i> Attend (In-Person)
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </li>
                         <?php endforeach; ?>
                     </ul>

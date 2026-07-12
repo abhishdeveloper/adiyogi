@@ -141,6 +141,17 @@
                                          <i class="fa-solid fa-location-dot mt-1 mr-1.5 text-gray-400 w-3"></i>
                                          <span><?php echo htmlspecialchars($app->address); ?></span>
                                     </div>
+                                    <div class="mt-3 flex gap-2">
+                                        <?php if(isset($app->consultation_type) && $app->consultation_type == 'video'): ?>
+                                            <a href="/patientdashboard/telemedicine/<?php echo $app->id; ?>" class="inline-flex items-center px-3 py-1 border border-transparent shadow-sm text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700">
+                                                <i class="fa-solid fa-video mr-1.5"></i> Join Video Call
+                                            </a>
+                                        <?php else: ?>
+                                            <span class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-600 bg-gray-100">
+                                                <i class="fa-solid fa-building mr-1.5"></i> In-Person Visit
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
