@@ -511,4 +511,197 @@ class Clinicdashboard extends Controller {
             echo json_encode(['error' => 'Failed to block time']);
         }
     }
+
+
+    // Manage Billing & Invoices
+    public function billing() {
+        $this->requireOwner();
+        $clinic = $this->getClinicContext();
+
+        $this->db = new Database();
+
+        // Get Active Subscription
+        $this->db->query("SELECT * FROM subscriptions WHERE clinic_id = :cid AND status = 'active' ORDER BY id DESC LIMIT 1");
+        $this->db->bind(':cid', $clinic->id);
+        $active_sub = $this->db->single();
+
+        // Get Billing History (Invoices)
+        $this->db->query("SELECT * FROM invoices WHERE user_id = :uid ORDER BY id DESC");
+        $this->db->bind(':uid', $_SESSION['user_id']);
+        $invoices = $this->db->resultSet();
+
+        $data = [
+            'clinic' => $clinic,
+            'active_sub' => $active_sub,
+            'invoices' => $invoices
+        ];
+
+        $this->view('clinic/billing', $data);
+    }
+
+    // Checkout for Subscription Upgrade
+    public function pay_subscription() {
+        $this->requireOwner();
+        $clinic = $this->getClinicContext();
+
+        $plan_id = $_POST['plan_id'] ?? 'premium';
+        $amount = 999.00; // Hardcoded for this phase
+
+        // Initiate Razorpay Order using global admin credentials
+        $this->settingModel = $this->model('Setting');
+        $rzp_key = $this->settingModel->getSetting('razorpay_key_id');
+        $rzp_secret = $this->settingModel->getSetting('razorpay_key_secret');
+
+        $orderData = [
+            'receipt' => 'sub_rcpt_' . $clinic->id . '_' . time(),
+            'amount' => $amount * 100, // in paise
+            'currency' => 'INR'
+        ];
+
+        $ch = curl_init('https://api.razorpay.com/v1/orders');
+        curl_setopt($ch, CURLOPT_USERPWD, $rzp_key . ':' . $rzp_secret);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($orderData));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        $rzpOrder = json_decode($response);
+
+        if(!isset($rzpOrder->id)) {
+            die("Payment gateway error. Please try again later.");
+        }
+
+        $data = [
+            'clinic' => $clinic,
+            'plan_id' => $plan_id,
+            'amount' => $amount,
+            'order_id' => $rzpOrder->id,
+            'key' => $rzp_key
+        ];
+
+        $this->view('clinic/pay_subscription', $data);
+    }
+
+    // Verify Subscription Payment
+    public function verify_subscription() {
+        $this->requireOwner();
+        $clinic = $this->getClinicContext();
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $rzp_payment_id = $_POST['razorpay_payment_id'];
+            $rzp_order_id = $_POST['razorpay_order_id'];
+            $rzp_signature = $_POST['razorpay_signature'];
+
+            $this->settingModel = $this->model('Setting');
+            $secret = $this->settingModel->getSetting('razorpay_key_secret');
+
+            $generated_signature = hash_hmac('sha256', $rzp_order_id . "|" . $rzp_payment_id, $secret);
+
+            if (hash_equals($generated_signature, $rzp_signature)) {
+                // Update Clinic to Premium
+                $this->db = new Database();
+                $this->db->query("UPDATE clinics SET is_premium = 1 WHERE id = :id");
+                $this->db->bind(':id', $clinic->id);
+                $this->db->execute();
+
+                // Record Subscription
+                $start_date = date('Y-m-d');
+                $end_date = date('Y-m-d', strtotime('+1 month'));
+                $this->db->query("INSERT INTO subscriptions (clinic_id, plan_name, amount, start_date, end_date, razorpay_subscription_id) VALUES (:cid, 'premium', 999.00, :start, :end, :payid)");
+                $this->db->bind(':cid', $clinic->id);
+                $this->db->bind(':start', $start_date);
+                $this->db->bind(':end', $end_date);
+                $this->db->bind(':payid', $rzp_payment_id);
+                $this->db->execute();
+
+                // Record Invoice
+                $invoice_no = 'INV-' . strtoupper(uniqid());
+                $this->db->query("INSERT INTO invoices (type, reference_id, user_id, amount, invoice_number) VALUES ('subscription', :cid, :uid, 999.00, :inv)");
+                $this->db->bind(':cid', $clinic->id);
+                $this->db->bind(':uid', $_SESSION['user_id']);
+                $this->db->bind(':inv', $invoice_no);
+                $this->db->execute();
+
+                header('location: /clinicdashboard/billing?success=upgraded');
+                die();
+            } else {
+                header('location: /clinicdashboard/billing?error=paymentfailed');
+                die();
+            }
+        }
+    }
+
+    // Manage Multiple Doctors in a Clinic
+    public function doctors() {
+        $this->requireOwner();
+        $clinic = $this->getClinicContext();
+
+        $this->db = new Database();
+
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$this->validateCsrfToken($_POST['csrf_token'])) {
+                die("CSRF token validation failed.");
+            }
+
+            if(isset($_POST['action']) && $_POST['action'] == 'add') {
+                $name = trim($_POST['name']);
+                $specialty = trim($_POST['specialty']);
+                $qualifications = trim($_POST['qualifications']);
+                $bio = trim($_POST['bio']);
+
+                $photo = null;
+                if(isset($_FILES['photo']) && $_FILES['photo']['error'] == 0) {
+                    $allowed = ['jpg', 'jpeg', 'png'];
+                    $filename = $_FILES['photo']['name'];
+                    $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                    if(in_array($ext, $allowed)) {
+                        $new_filename = uniqid('doc_') . '.' . $ext;
+                        if(move_uploaded_file($_FILES['photo']['tmp_name'], APP_ROOT . '/assets/uploads/profiles/' . $new_filename)) {
+                            $photo = $new_filename;
+                        }
+                    }
+                }
+
+                $this->db->query("INSERT INTO clinic_doctors (clinic_id, name, specialty, qualifications, bio, photo) VALUES (:cid, :name, :spec, :qual, :bio, :photo)");
+                $this->db->bind(':cid', $clinic->id);
+                $this->db->bind(':name', $name);
+                $this->db->bind(':spec', $specialty);
+                $this->db->bind(':qual', $qualifications);
+                $this->db->bind(':bio', $bio);
+                $this->db->bind(':photo', $photo);
+
+                if($this->db->execute()) {
+                    header('location: /clinicdashboard/doctors?success=added');
+                } else {
+                    header('location: /clinicdashboard/doctors?error=failed');
+                }
+                die();
+
+            } elseif(isset($_POST['action']) && $_POST['action'] == 'delete') {
+                $doc_id = $_POST['doctor_id'];
+                $this->db->query("DELETE FROM clinic_doctors WHERE id = :id AND clinic_id = :cid");
+                $this->db->bind(':id', $doc_id);
+                $this->db->bind(':cid', $clinic->id);
+                $this->db->execute();
+                header('location: /clinicdashboard/doctors?success=deleted');
+                die();
+            }
+        }
+
+        $this->db->query("SELECT * FROM clinic_doctors WHERE clinic_id = :cid ORDER BY id DESC");
+        $this->db->bind(':cid', $clinic->id);
+        $doctors = $this->db->resultSet();
+
+        $data = [
+            'clinic' => $clinic,
+            'doctors' => $doctors,
+            'success_msg' => isset($_GET['success']) ? 'Action completed successfully.' : '',
+            'error_msg' => isset($_GET['error']) ? 'An error occurred.' : ''
+        ];
+
+        $this->view('clinic/doctors', $data);
+    }
 }
