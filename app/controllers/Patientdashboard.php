@@ -239,9 +239,34 @@ class PatientDashboard extends Controller {
                 die("CSRF token validation failed.");
             }
 
-            // In a real application, you would validate and save this data to the database
-            // For now, we will just simulate a successful update
-            $data['success_msg'] = 'Profile updated successfully.';
+            // Check if profile exists
+            $this->db->query("SELECT id FROM patient_profiles WHERE user_id = :uid");
+            $this->db->bind(':uid', $_SESSION['user_id']);
+            $existing = $this->db->single();
+
+            if ($existing) {
+                $this->db->query("UPDATE patient_profiles SET dob = :dob, gender = :gender, blood_group = :blood_group, allergies = :allergies, medical_history = :medical_history, emergency_contact = :emergency_contact WHERE user_id = :uid");
+            } else {
+                $this->db->query("INSERT INTO patient_profiles (user_id, dob, gender, blood_group, allergies, medical_history, emergency_contact) VALUES (:uid, :dob, :gender, :blood_group, :allergies, :medical_history, :emergency_contact)");
+            }
+
+            $this->db->bind(':uid', $_SESSION['user_id']);
+
+            // Convert empty string for dob to null
+            $dob = empty(trim($_POST['dob'] ?? '')) ? null : trim($_POST['dob'] ?? '');
+            $this->db->bind(':dob', $dob);
+
+            $gender = empty(trim($_POST['gender'] ?? '')) ? null : trim($_POST['gender'] ?? '');
+            $this->db->bind(':gender', $gender);
+
+            $this->db->bind(':blood_group', trim($_POST['blood_group'] ?? ''));
+            $this->db->bind(':allergies', trim($_POST['allergies'] ?? ''));
+            $this->db->bind(':medical_history', trim($_POST['medical_history'] ?? ''));
+            $this->db->bind(':emergency_contact', trim($_POST['emergency_contact'] ?? ''));
+
+            if ($this->db->execute()) {
+                $data['success_msg'] = 'Profile updated successfully.';
+            }
         }
 
         // Simulating loading profile data
