@@ -3,8 +3,13 @@ class Clinicdashboard extends Controller {
     private $clinicModel;
     private $appointmentModel;
     private $userModel;
+    private $presavedModel;
+    private $prescriptionModel;
+    private $staffModel;
+    private $db;
+    private $settingModel;
 
-        public function __construct() {
+    public function __construct() {
         if(!isset($_SESSION['user_id']) || ($_SESSION['user_role'] != 'clinic' && $_SESSION['user_role'] != 'staff')) {
             header('location: /auth/login');
             die();

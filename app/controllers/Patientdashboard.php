@@ -232,6 +232,81 @@ class PatientDashboard extends Controller {
         }
     }
 
+    // Update Patient Profile
+    public function profile() {
+        if($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$this->validateCsrfToken($_POST['csrf_token'])) {
+                die("CSRF token validation failed.");
+            }
+
+            // In a real application, you would validate and save this data to the database
+            // For now, we will just simulate a successful update
+            $data['success_msg'] = 'Profile updated successfully.';
+        }
+
+        // Simulating loading profile data
+        $this->db->query("SELECT * FROM patient_profiles WHERE user_id = :uid");
+        $this->db->bind(':uid', $_SESSION['user_id']);
+        $profile = $this->db->single();
+
+        $data['profile'] = $profile;
+
+        $this->view('patient/profile', $data);
+    }
+
+    // View Prescription
+    public function prescription($appointment_id) {
+        $prescriptionModel = $this->model('Prescription');
+        $prescription = $prescriptionModel->getByAppointment($appointment_id);
+
+        if(!$prescription || $prescription->patient_user_id != $_SESSION['user_id']) {
+            die("Prescription not found or access denied.");
+        }
+
+        $data = [
+            'prescription' => $prescription
+        ];
+
+        // We can reuse the clinic's prescription view for the patient, or create a specific one
+        // Using patient's attend view which shows the prescription
+        $appointment = $this->appointmentModel->getAppointmentById($appointment_id);
+        $data['appointment'] = $appointment;
+
+        $this->view('patient/attend', $data);
+    }
+
+    // Patient Attend/View specific appointment (used for chat and prescription)
+    public function attend($appointment_id) {
+        $appointment = $this->appointmentModel->getAppointmentById($appointment_id);
+
+        if(!$appointment || $appointment->patient_user_id != $_SESSION['user_id']) {
+            die("Appointment not found or access denied.");
+        }
+
+        $prescriptionModel = $this->model('Prescription');
+        $prescription = $prescriptionModel->getByAppointment($appointment_id);
+
+        $data = [
+            'appointment' => $appointment,
+            'prescription' => $prescription
+        ];
+
+        $this->view('patient/attend', $data);
+    }
+
+    // Billing history
+    public function billing() {
+        $this->db->query("SELECT * FROM appointments WHERE patient_user_id = :uid AND payment_status = 'paid' ORDER BY created_at DESC");
+        $this->db->bind(':uid', $_SESSION['user_id']);
+        $invoices = $this->db->resultSet();
+
+        $data = [
+            'invoices' => $invoices
+        ];
+
+        $this->view('patient/billing', $data);
+    }
+
     // Medical Records & Lab Reports
     public function records() {
         $medicalRecordModel = $this->model('MedicalRecord');

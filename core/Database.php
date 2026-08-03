@@ -28,14 +28,18 @@ class Database {
             $this->dbh = new PDO($dsn, $this->user, $this->pass, $options);
         } catch(PDOException $e) {
             $this->error = $e->getMessage();
-            // In a real production environment, you might log this instead of echoing
-            // echo $this->error;
+            // Show a generic 500 error if connection fails in production
+            http_response_code(500);
+            die("Database connection failed. Please try again later.");
         }
     }
 
     // Prepare statement with query
     public function query($sql) {
-        if ($this->dbh === null) return false;
+        if ($this->dbh === null) {
+            http_response_code(500);
+            die("Database connection failed.");
+        }
         $this->stmt = $this->dbh->prepare($sql);
     }
 

@@ -109,3 +109,29 @@ class Appointment {
         $this->db->bind(':clinic_id', $clinic_id);
         return $this->db->resultSet();
     }
+
+    // Get appointment by ID
+    public function getAppointmentById($appointment_id) {
+        $this->db->query("SELECT a.*, u.first_name, u.last_name, u.email FROM appointments a JOIN users u ON a.patient_user_id = u.id WHERE a.id = :id");
+        $this->db->bind(':id', $appointment_id);
+        return $this->db->single();
+    }
+
+    // Get Clinic Appointments By Range
+    public function getClinicAppointmentsByRange($clinic_id, $start, $end) {
+        $this->db->query("SELECT a.*, u.first_name, u.last_name, u.email FROM appointments a JOIN users u ON a.patient_user_id = u.id WHERE a.clinic_id = :clinic_id AND a.appointment_datetime >= :start AND a.appointment_datetime <= :end");
+        $this->db->bind(':clinic_id', $clinic_id);
+        $this->db->bind(':start', $start);
+        $this->db->bind(':end', $end);
+        return $this->db->resultSet();
+    }
+
+    // Update Appointment Time
+    public function updateAppointmentTime($appointment_id, $clinic_id, $new_datetime) {
+        $this->db->query("UPDATE appointments SET appointment_datetime = :new_datetime WHERE id = :id AND clinic_id = :clinic_id");
+        $this->db->bind(':new_datetime', $new_datetime);
+        $this->db->bind(':id', $appointment_id);
+        $this->db->bind(':clinic_id', $clinic_id);
+        return $this->db->execute();
+    }
+}
