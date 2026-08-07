@@ -1,0 +1,42 @@
+--- a/app/controllers/Patientdashboard.php
++++ b/app/controllers/Patientdashboard.php
+@@ -231,16 +231,26 @@
+                 die("CSRF token validation failed.");
+             }
+
+-            $profileData = [
+-                'user_id' => $_SESSION['user_id'],
+-                'dob' => empty(trim($_POST['dob'] ?? '')) ? null : trim($_POST['dob'] ?? ''),
+-                'gender' => empty(trim($_POST['gender'] ?? '')) ? null : trim($_POST['gender'] ?? ''),
+-                'blood_group' => trim($_POST['blood_group'] ?? ''),
+-                'allergies' => trim($_POST['allergies'] ?? ''),
+-                'medical_history' => trim($_POST['medical_history'] ?? ''),
+-                'emergency_contact' => trim($_POST['emergency_contact'] ?? '')
+-            ];
+-
+-            if ($this->patientProfileModel->updateProfile($profileData)) {
+-                $data['success_msg'] = 'Profile updated successfully.';
+-            }
++            // Validate inputs
++            $data['error_msg'] = '';
++            if(!empty($_POST['dob'])) {
++                $date_err = Validator::date($_POST['dob']);
++                if(!empty($date_err)) $data['error_msg'] = $date_err;
++            }
++
++            if(empty($data['error_msg'])) {
++                $profileData = [
++                    'user_id' => $_SESSION['user_id'],
++                    'dob' => empty(trim($_POST['dob'] ?? '')) ? null : trim($_POST['dob'] ?? ''),
++                    'gender' => empty(trim($_POST['gender'] ?? '')) ? null : trim($_POST['gender'] ?? ''),
++                    'blood_group' => trim($_POST['blood_group'] ?? ''),
++                    'allergies' => trim($_POST['allergies'] ?? ''),
++                    'medical_history' => trim($_POST['medical_history'] ?? ''),
++                    'emergency_contact' => trim($_POST['emergency_contact'] ?? '')
++                ];
++
++                if ($this->patientProfileModel->updateProfile($profileData)) {
++                    $data['success_msg'] = 'Profile updated successfully.';
++                }
++            }
+         }

@@ -1,0 +1,121 @@
+--- a/app/controllers/Auth.php
++++ b/app/controllers/Auth.php
+@@ -31,6 +31,10 @@
+             // Validate Email
+             if(empty($data['email'])) {
+                 $data['email_err'] = 'Please enter email';
++            } else {
++                $email_err = Validator::email($data['email']);
++                if(!empty($email_err)) {
++                    $data['email_err'] = $email_err;
++                }
+             }
+
+             // Validate Password
+@@ -107,11 +111,20 @@
+                 'confirm_password_err' => ''
+             ];
+
++            // Basic required validation
++            $required_errors = Validator::required(['first_name', 'last_name', 'email', 'password', 'confirm_password'], $_POST);
++            if(!empty($required_errors)) {
++                if(isset($required_errors['first_name'])) $data['first_name_err'] = $required_errors['first_name'];
++                if(isset($required_errors['last_name'])) $data['last_name_err'] = $required_errors['last_name'];
++                if(isset($required_errors['email'])) $data['email_err'] = $required_errors['email'];
++                if(isset($required_errors['password'])) $data['password_err'] = $required_errors['password'];
++                if(isset($required_errors['confirm_password'])) $data['confirm_password_err'] = $required_errors['confirm_password'];
++            }
++
+             // Validate Email
+-            if(empty($data['email'])) {
+-                $data['email_err'] = 'Please enter email';
+-            } else {
+-                // Check email
+-                if($this->userModel->findUserByEmail($data['email'])) {
++            if(empty($data['email_err'])) {
++                $email_err = Validator::email($data['email']);
++                if(!empty($email_err)) {
++                    $data['email_err'] = $email_err;
++                } elseif($this->userModel->findUserByEmail($data['email'])) {
+                     $data['email_err'] = 'Email is already taken';
+                 }
+             }
+
+             // Validate Password
+-            if(empty($data['password'])) {
+-                $data['password_err'] = 'Please enter password';
+-            } elseif(strlen($data['password']) < 6) {
+-                $data['password_err'] = 'Password must be at least 6 characters';
++            if(empty($data['password_err'])) {
++                $password_err = Validator::password($data['password']);
++                if(!empty($password_err)) {
++                    $data['password_err'] = $password_err;
++                }
+             }
+
+             // Validate Confirm Password
+@@ -194,15 +207,32 @@
+                 'confirm_password_err' => ''
+             ];
+
+-            // Validate Clinic Name
+-            if(empty($data['clinic_name'])) {
+-                $data['clinic_name_err'] = 'Please enter clinic name';
+-            }
++            // Basic required validation
++            $required_errors = Validator::required(['clinic_name', 'email', 'phone', 'address', 'city', 'state', 'zip', 'license_number', 'specialty', 'password', 'confirm_password'], $_POST);
++            if(!empty($required_errors)) {
++                if(isset($required_errors['clinic_name'])) $data['clinic_name_err'] = $required_errors['clinic_name'];
++                if(isset($required_errors['email'])) $data['email_err'] = $required_errors['email'];
++                if(isset($required_errors['phone'])) $data['phone_err'] = $required_errors['phone'];
++                if(isset($required_errors['address'])) $data['address_err'] = $required_errors['address'];
++                if(isset($required_errors['city'])) $data['city_err'] = $required_errors['city'];
++                if(isset($required_errors['state'])) $data['state_err'] = $required_errors['state'];
++                if(isset($required_errors['zip'])) $data['zip_err'] = $required_errors['zip'];
++                if(isset($required_errors['license_number'])) $data['license_number_err'] = $required_errors['license_number'];
++                if(isset($required_errors['specialty'])) $data['specialty_err'] = $required_errors['specialty'];
++                if(isset($required_errors['password'])) $data['password_err'] = $required_errors['password'];
++                if(isset($required_errors['confirm_password'])) $data['confirm_password_err'] = $required_errors['confirm_password'];
++            }
+
+             // Validate Email
+-            if(empty($data['email'])) {
+-                $data['email_err'] = 'Please enter email';
+-            } else {
+-                // Check email
+-                if($this->userModel->findUserByEmail($data['email'])) {
++            if(empty($data['email_err'])) {
++                $email_err = Validator::email($data['email']);
++                if(!empty($email_err)) {
++                    $data['email_err'] = $email_err;
++                } elseif($this->userModel->findUserByEmail($data['email'])) {
+                     $data['email_err'] = 'Email is already taken';
+                 }
+             }
+
+             // Validate Phone
+-            if(empty($data['phone'])) {
+-                $data['phone_err'] = 'Please enter phone number';
++            if(empty($data['phone_err'])) {
++                $phone_err = Validator::phone($data['phone']);
++                if(!empty($phone_err)) {
++                    $data['phone_err'] = $phone_err;
++                }
+             }
+
+             // Validate Address (simplified)
+             // Validate City, State, Zip (simplified)
+
+             // Validate Password
+-            if(empty($data['password'])) {
+-                $data['password_err'] = 'Please enter password';
+-            } elseif(strlen($data['password']) < 6) {
+-                $data['password_err'] = 'Password must be at least 6 characters';
++            if(empty($data['password_err'])) {
++                $password_err = Validator::password($data['password']);
++                if(!empty($password_err)) {
++                    $data['password_err'] = $password_err;
++                }
+             }
+
+             // Validate Confirm Password

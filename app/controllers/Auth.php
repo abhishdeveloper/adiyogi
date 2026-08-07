@@ -31,6 +31,11 @@ class Auth extends Controller {
             // Validate Email
             if(empty($data['email'])) {
                 $data['email_err'] = 'Please enter email';
+            } else {
+                $email_err = Validator::email($data['email']);
+                if(!empty($email_err)) {
+                    $data['email_err'] = $email_err;
+                }
             }
 
             // Validate Password

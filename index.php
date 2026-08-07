@@ -8,9 +8,9 @@
 define('APP_ROOT', dirname(__FILE__));
 
 // Basic error reporting for development (should be turned off in production)
-ini_set('display_errors', 0);
-ini_set('display_startup_errors', 0);
-error_reporting(0);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 // Security Headers
 header("X-Frame-Options: DENY");

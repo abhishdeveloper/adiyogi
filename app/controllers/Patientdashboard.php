@@ -250,22 +250,31 @@ class PatientDashboard extends Controller {
                 $this->db->query("INSERT INTO patient_profiles (user_id, dob, gender, blood_group, allergies, medical_history, emergency_contact) VALUES (:uid, :dob, :gender, :blood_group, :allergies, :medical_history, :emergency_contact)");
             }
 
-            $this->db->bind(':uid', $_SESSION['user_id']);
+            // Validate inputs
+            $data['error_msg'] = '';
+            if(!empty($_POST['dob'])) {
+                $date_err = Validator::date($_POST['dob']);
+                if(!empty($date_err)) $data['error_msg'] = $date_err;
+            }
 
-            // Convert empty string for dob to null
-            $dob = empty(trim($_POST['dob'] ?? '')) ? null : trim($_POST['dob'] ?? '');
-            $this->db->bind(':dob', $dob);
+            if(empty($data['error_msg'])) {
+                $this->db->bind(':uid', $_SESSION['user_id']);
 
-            $gender = empty(trim($_POST['gender'] ?? '')) ? null : trim($_POST['gender'] ?? '');
-            $this->db->bind(':gender', $gender);
+                // Convert empty string for dob to null
+                $dob = empty(trim($_POST['dob'] ?? '')) ? null : trim($_POST['dob'] ?? '');
+                $this->db->bind(':dob', $dob);
 
-            $this->db->bind(':blood_group', trim($_POST['blood_group'] ?? ''));
-            $this->db->bind(':allergies', trim($_POST['allergies'] ?? ''));
-            $this->db->bind(':medical_history', trim($_POST['medical_history'] ?? ''));
-            $this->db->bind(':emergency_contact', trim($_POST['emergency_contact'] ?? ''));
+                $gender = empty(trim($_POST['gender'] ?? '')) ? null : trim($_POST['gender'] ?? '');
+                $this->db->bind(':gender', $gender);
 
-            if ($this->db->execute()) {
-                $data['success_msg'] = 'Profile updated successfully.';
+                $this->db->bind(':blood_group', trim($_POST['blood_group'] ?? ''));
+                $this->db->bind(':allergies', trim($_POST['allergies'] ?? ''));
+                $this->db->bind(':medical_history', trim($_POST['medical_history'] ?? ''));
+                $this->db->bind(':emergency_contact', trim($_POST['emergency_contact'] ?? ''));
+
+                if ($this->db->execute()) {
+                    $data['success_msg'] = 'Profile updated successfully.';
+                }
             }
         }
 

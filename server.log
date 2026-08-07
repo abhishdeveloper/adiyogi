@@ -1,0 +1,16 @@
+[Fri Aug  7 12:56:34 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Fri Aug  7 12:56:36 2026] [::1]:59400 Accepted
+[Fri Aug  7 12:56:36 2026] [::1]:59400 Closing
+[Fri Aug  7 12:59:47 2026] [::1]:44950 Accepted
+[Fri Aug  7 12:59:47 2026] [::1]:44950 Closing
+[Fri Aug  7 13:09:25 2026] [::1]:45204 Accepted
+[Fri Aug  7 13:09:25 2026] [::1]:45204 Closing
+[Fri Aug  7 13:15:21 2026] [::1]:60828 Accepted
+[Fri Aug  7 13:15:21 2026] PHP Parse error:  syntax error, unexpected token "else" in /app/app/controllers/Auth.php on line 39
+[Fri Aug  7 13:15:21 2026] [::1]:60828 Closing
+[Fri Aug  7 13:31:54 2026] [::1]:51680 Accepted
+[Fri Aug  7 13:31:54 2026] [::1]:51680 Closing
+[Fri Aug  7 13:35:07 2026] [::1]:48498 Accepted
+[Fri Aug  7 13:35:07 2026] [::1]:48498 Closing
+[Fri Aug  7 13:38:23 2026] [::1]:52564 Accepted
+[Fri Aug  7 13:38:23 2026] [::1]:52564 Closing
